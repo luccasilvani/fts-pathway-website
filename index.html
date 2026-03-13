@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fts pathway</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;600;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --cream: #F1EEE6;
+      --black: #2B2926;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Jost', Arial, sans-serif;
+      background-color: var(--cream);
+      color: var(--black);
+      text-transform: lowercase;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Global lowercase override */
+    *, *::before, *::after { text-transform: lowercase; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: var(--black);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2.5rem;
+      height: 72px;
+      overflow: visible;
+    }
+
+    .nav-logo {
+      height: 68px;
+      width: auto;
+      display: block;
+      mix-blend-mode: lighten;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 0;
+      list-style: none;
+      background: rgba(241,238,230,0.08);
+      border-radius: 999px;
+      padding: 5px;
+    }
+
+    .nav-links a {
+      display: block;
+      padding: 6px 18px;
+      border-radius: 999px;
+      font-family: 'Jost', Arial, sans-serif;
+      font-size: 0.78rem;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      color: var(--cream);
+      text-decoration: none;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      background: var(--cream);
+      color: var(--black);
+    }
+
+    .nav-cta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 22px;
+      border-radius: 999px;
+      background: var(--cream);
+      color: var(--black);
+      font-family: 'Jost', Arial, sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s ease, transform 0.15s ease;
+    }
+
+    .nav-cta:hover { opacity: 0.85; transform: translateY(-1px); }
+    .nav-cta:active { transform: translateY(0); }
+
+    .nav-cta::before {
+      content: '';
+      display: block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--black);
+      flex-shrink: 0;
+    }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      background: var(--black);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 2.5rem 4rem;
+      padding-top: 72px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── HERO BACKGROUND IMAGES ── */
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      pointer-events: none;
+    }
+
+    .hero-bg-half {
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero-bg-half img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+      filter: grayscale(100%) brightness(0.38) contrast(1.1);
+    }
+
+    .hero-bg-half.right img {
+      /* boost contrast slightly to compensate for lower source resolution */
+      filter: grayscale(100%) brightness(0.38) contrast(1.25) saturate(0);
+      object-fit: cover;
+      object-position: center 8%;
+      transform: scale(1.18);
+      transform-origin: center 8%;
+    }
+
+    .hero-bg-divider {
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 50%;
+      width: 1px;
+      background: rgba(241,238,230,0.12);
+      z-index: 2;
+    }
+
+    .hero-bg-overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to bottom, rgba(43,41,38,0.55) 0%, rgba(43,41,38,0.25) 40%, rgba(43,41,38,0.82) 100%),
+        linear-gradient(to right, rgba(43,41,38,0.3) 0%, transparent 30%, transparent 70%, rgba(43,41,38,0.3) 100%);
+      z-index: 3;
+    }
+
+    .hero-grain {
+      position: absolute;
+      inset: 0;
+      opacity: 0.045;
+      z-index: 4;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+
+.hero-content {
+      position: relative;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      height: 100%;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 400;
+      letter-spacing: 0.14em;
+      color: rgba(241,238,230,0.45);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-display {
+      font-size: clamp(4rem, 10vw, 9.5rem);
+      font-weight: 800;
+      line-height: 0.92;
+      letter-spacing: -0.03em;
+      color: var(--cream);
+      margin-bottom: 2.5rem;
+    }
+
+    .hero-display .hero-word.outlined,
+    .hero-display span.outlined {
+      -webkit-text-stroke: 2px var(--cream);
+      color: transparent;
+    }
+
+    .hero-bottom {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-mission {
+      font-size: 0.88rem;
+      font-weight: 300;
+      line-height: 1.75;
+      color: rgba(241,238,230,0.6);
+      max-width: 340px;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 28px;
+      border-radius: 999px;
+      border: 1.5px solid rgba(241,238,230,0.3);
+      background: transparent;
+      color: var(--cream);
+      font-family: 'Jost', Arial, sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+    }
+
+    .hero-cta:hover {
+      background: var(--cream);
+      color: var(--black);
+      border-color: var(--cream);
+      transform: translateY(-2px);
+    }
+
+    .hero-cta:active { transform: translateY(0); }
+
+    .hero-cta::before {
+      content: '';
+      display: block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      flex-shrink: 0;
+    }
+
+    .hero-scroll-line {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hero-scroll-line span {
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: rgba(241,238,230,0.3);
+    }
+
+    .hero-scroll-line .line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, rgba(241,238,230,0.3), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; transform: scaleY(1); }
+      50% { opacity: 0.7; transform: scaleY(1.1); }
+    }
+
+    /* ── ABOUT BENTO ── */
+    #about {
+      background: var(--cream);
+      padding: 6rem 2.5rem;
+    }
+
+    .section-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 400;
+      letter-spacing: 0.16em;
+      color: rgba(43,41,38,0.4);
+      margin-bottom: 1rem;
+    }
+
+    .section-heading {
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      color: var(--black);
+      margin-bottom: 3rem;
+    }
+
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: auto;
+      gap: 12px;
+    }
+
+    .bento-card {
+      border-radius: 16px;
+      padding: 2rem;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .bento-dark { background: var(--black); color: var(--cream); }
+    .bento-light { background: rgba(43,41,38,0.06); color: var(--black); }
+    .bento-outline {
+      background: transparent;
+      color: var(--black);
+      border: 1.5px solid rgba(43,41,38,0.15);
+    }
+
+    .bento-card-number {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      opacity: 0.35;
+      margin-bottom: 2.5rem;
+    }
+
+    .bento-card-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 0.75rem;
+    }
+
+    .bento-card-body {
+      font-size: 0.83rem;
+      font-weight: 300;
+      line-height: 1.75;
+      opacity: 0.7;
+    }
+
+    .bento-card-large-text {
+      font-size: clamp(2.5rem, 4vw, 4rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+
+    .bento-col-5 { grid-column: span 5; }
+    .bento-col-7 { grid-column: span 7; }
+    .bento-col-4 { grid-column: span 4; }
+    .bento-col-8 { grid-column: span 8; }
+    .bento-col-6 { grid-column: span 6; }
+    .bento-col-12 { grid-column: span 12; }
+
+    /* ── HOW IT WORKS ── */
+    #how-it-works {
+      background: var(--black);
+      padding: 6rem 2.5rem;
+      color: var(--cream);
+    }
+
+    #how-it-works .section-eyebrow { color: rgba(241,238,230,0.35); }
+    #how-it-works .section-heading { color: var(--cream); }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border: 1px solid rgba(241,238,230,0.1);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .step-item {
+      padding: 2.5rem 2rem;
+      border-right: 1px solid rgba(241,238,230,0.1);
+      position: relative;
+    }
+
+    .step-item:last-child { border-right: none; }
+
+    .step-number {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      color: rgba(241,238,230,0.35);
+      margin-bottom: 2rem;
+    }
+
+    .step-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      color: var(--cream);
+      margin-bottom: 1rem;
+    }
+
+    .step-body {
+      font-size: 0.83rem;
+      font-weight: 300;
+      line-height: 1.75;
+      color: rgba(241,238,230,0.55);
+    }
+
+    .step-large-num {
+      position: absolute;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      font-size: 5rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: rgba(241,238,230,0.05);
+      line-height: 1;
+    }
+
+    /* ── WHAT SETS US APART ── */
+    #stats {
+      background: var(--cream);
+      padding: 6rem 2.5rem;
+    }
+
+    .apart-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .apart-card {
+      border-radius: 16px;
+      padding: 2rem 1.5rem 1.75rem;
+      min-height: 160px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .apart-card.light { background: #E8E5DD; }
+    .apart-card.dark  { background: var(--black); }
+
+    .apart-value {
+      font-size: clamp(1.75rem, 3vw, 2.75rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      margin-bottom: 0.6rem;
+    }
+
+    .apart-card.light .apart-value { color: var(--black); }
+    .apart-card.dark  .apart-value { color: var(--cream); }
+
+    .apart-label {
+      font-size: 0.8rem;
+      font-weight: 400;
+      line-height: 1.4;
+    }
+
+    .apart-card.light .apart-label { color: rgba(43,41,38,0.55); }
+    .apart-card.dark  .apart-label { color: rgba(241,238,230,0.5); }
+
+    /* ── TESTIMONIALS ── */
+    #testimonials {
+      background: var(--black);
+      padding: 6rem 2.5rem;
+      color: var(--cream);
+    }
+
+    #testimonials .section-eyebrow { color: rgba(241,238,230,0.35); }
+    #testimonials .section-heading { color: var(--cream); }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .testimonial-card {
+      border: 1px solid rgba(241,238,230,0.1);
+      border-radius: 16px;
+      padding: 2rem;
+      position: relative;
+    }
+
+    .testimonial-quote {
+      font-size: 0.88rem;
+      font-weight: 300;
+      line-height: 1.75;
+      color: rgba(241,238,230,0.7);
+      margin-bottom: 1.5rem;
+    }
+
+    .testimonial-author {
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: var(--cream);
+    }
+
+    .testimonial-role {
+      font-size: 0.72rem;
+      font-weight: 300;
+      letter-spacing: 0.04em;
+      color: rgba(241,238,230,0.4);
+      margin-top: 2px;
+    }
+
+    .testimonial-mark {
+      font-size: 4rem;
+      font-weight: 800;
+      color: rgba(241,238,230,0.06);
+      line-height: 1;
+      position: absolute;
+      top: 1rem;
+      right: 1.5rem;
+    }
+
+    /* ── CONTACT ── */
+    #contact {
+      background: var(--cream);
+      padding: 6rem 2.5rem;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    .contact-statement {
+      font-size: clamp(2rem, 3.5vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      color: var(--black);
+    }
+
+    .contact-sub {
+      font-size: 0.88rem;
+      font-weight: 300;
+      line-height: 1.75;
+      color: rgba(43,41,38,0.6);
+      margin-top: 1.25rem;
+      max-width: 380px;
+    }
+
+    .contact-right { display: flex; flex-direction: column; gap: 1rem; }
+
+    .contact-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 1.25rem 1.5rem;
+      border: 1.5px solid rgba(43,41,38,0.15);
+      border-radius: 12px;
+      text-decoration: none;
+      color: var(--black);
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 0.03em;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+    }
+
+    .contact-link:hover {
+      background: var(--black);
+      color: var(--cream);
+      border-color: var(--black);
+      transform: translateY(-2px);
+    }
+
+    .contact-link:active { transform: translateY(0); }
+
+    .contact-link-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(43,41,38,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .contact-link:hover .contact-link-icon {
+      background: rgba(241,238,230,0.15);
+    }
+
+    .contact-link-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .contact-note {
+      font-size: 0.72rem;
+      font-weight: 300;
+      color: rgba(43,41,38,0.4);
+      letter-spacing: 0.03em;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--black);
+      padding: 3rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .footer-logo { height: 60px; width: auto; mix-blend-mode: lighten; }
+
+    .footer-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .footer-links a {
+      font-size: 0.75rem;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      color: rgba(241,238,230,0.45);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .footer-links a:hover { color: var(--cream); }
+
+    .footer-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.25rem;
+    }
+
+    .footer-instagram {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: var(--cream);
+      text-decoration: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .footer-instagram:hover { opacity: 0.7; }
+
+    .footer-copy {
+      font-size: 0.65rem;
+      font-weight: 300;
+      color: rgba(241,238,230,0.25);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── MEET THE TEAM ── */
+    #team {
+      background: var(--cream);
+      padding: 6rem 2.5rem;
+    }
+
+    .team-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .founder-card {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      cursor: pointer;
+      aspect-ratio: 3/4;
+      background: var(--black);
+    }
+
+    .founder-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      display: block;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      filter: grayscale(15%);
+    }
+
+    .founder-card:hover img {
+      transform: scale(1.04);
+    }
+
+    .founder-name-tag {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 70px 28px 24px;
+      background: linear-gradient(to top, rgba(43,41,38,0.82) 0%, rgba(43,41,38,0.6) 50%, rgba(43,41,38,0.2) 80%, transparent 100%);
+      transform: translateY(0);
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .founder-card:hover .founder-name-tag {
+      transform: translateY(-155px);
+    }
+
+    .founder-name-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.55rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.5rem;
+    }
+
+    .founder-name-tag h3 {
+      font-family: 'Jost', 'Helvetica Neue', sans-serif;
+      font-size: clamp(1.5rem, 2.2vw, 2rem);
+      font-weight: 800;
+      color: #F1EEE6;
+      text-transform: lowercase;
+      letter-spacing: -0.03em;
+      margin: 0;
+      line-height: 1;
+    }
+
+    .founder-name-tag .card-handle {
+      font-family: 'Jost', 'Helvetica Neue', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: rgba(241,238,230,0.4);
+      text-decoration: none;
+      text-transform: lowercase;
+      transition: color 0.2s ease;
+    }
+
+    .founder-name-tag .card-handle:hover {
+      color: rgba(241,238,230,0.8);
+    }
+
+    .founder-name-tag .short-bio {
+      font-family: 'Jost', 'Helvetica Neue', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 300;
+      color: rgba(241,238,230,0.65);
+      text-transform: lowercase;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .founder-role {
+      font-family: 'Jost', 'Helvetica Neue', sans-serif;
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      color: rgba(241,238,230,0.4);
+      text-transform: lowercase;
+      margin: 0 0 8px;
+    }
+
+    .founder-long-bio {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 28px 28px 26px;
+      background: linear-gradient(to bottom, rgba(43,41,38,0.7) 0%, rgba(43,41,38,0.82) 100%);
+      transform: translateY(100%);
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.04s;
+      font-family: 'Jost', 'Helvetica Neue', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 300;
+      color: rgba(241,238,230,0.82);
+      text-transform: lowercase;
+      line-height: 1.65;
+    }
+
+    .founder-card:hover .founder-long-bio {
+      transform: translateY(0);
+    }
+
+
+    /* ── HERO ENTRANCE ANIMATION ── */
+    .hero-word {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(40px);
+      animation: wordIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes wordIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-eyebrow { opacity: 0; animation: wordIn 0.6s cubic-bezier(0.16,1,0.3,1) 0.1s forwards; }
+    .hero-display .line1 .hero-word { animation-delay: 0.25s; }
+    .hero-display .line2 .hero-word { animation-delay: 0.38s; }
+    .hero-display .line3 .hero-word { animation-delay: 0.51s; }
+    .hero-bottom { opacity: 0; animation: wordIn 0.7s cubic-bezier(0.16,1,0.3,1) 0.65s forwards; }
+
+    /* ── STAT COUNTER ── */
+    .stat-value[data-target] { transition: none; }
+
+    /* ── CARD HOVER TILT ── */
+    .tilt-card {
+      transform-style: preserve-3d;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform;
+    }
+
+    /* ── REVEAL ANIMATIONS ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .bento-col-5, .bento-col-7, .bento-col-4, .bento-col-8,
+      .bento-col-6, .bento-col-12 { grid-column: span 12; }
+
+      .steps-grid { grid-template-columns: 1fr; }
+      .step-item { border-right: none; border-bottom: 1px solid rgba(241,238,230,0.1); }
+      .step-item:last-child { border-bottom: none; }
+
+      .apart-grid { grid-template-columns: repeat(2, 1fr); }
+.team-grid { grid-template-columns: 1fr; }
+      .contact-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+
+      .nav-links { display: none; }
+
+      footer { flex-direction: column; align-items: flex-start; }
+      .footer-right { align-items: flex-start; }
+    }
+
+    @media (max-width: 600px) {
+      nav { padding: 0 1.25rem; }
+      #hero, #about, #how-it-works, #team, #stats, #contact { padding-left: 1.25rem; padding-right: 1.25rem; }
+      footer { padding: 2rem 1.25rem; }
+      .apart-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <img src="final_fts_logo_process_black.png" alt="fts pathway" class="nav-logo" />
+    <ul class="nav-links">
+      <li><a href="#about" class="active">about</a></li>
+      <li><a href="#how-it-works">how it works</a></li>
+      <li><a href="#team">team</a></li>
+      <li><a href="#stats">impact</a></li>
+      <li><a href="#contact">contact</a></li>
+    </ul>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSe9aEs_wLj6rBqFUNPlGtEDU3tFb4M2yqG-ZLbEsa2JYw1fhg/viewform?fbclid=PAdGRleAQgRt9leHRuA2FlbQIxMQBzcnRjBmFwcF9pZA8xMjQwMjQ1NzQyODc0MTQAAae9P9tJmithEOI-wKQ6aHQmKEIJr4vkfIYQXlEvgSYNyu68aoI6keBXc_0WVQ_aem_Twmkd1Bm5d77uTQvIfSkPA&pli=1" target="_blank" class="nav-cta">get started</a>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <!-- Background image split -->
+    <div class="hero-bg">
+      <div class="hero-bg-half left">
+        <img src="48964578513_58a94ab9ef_o.jpeg" alt="" />
+      </div>
+      <div class="hero-bg-half right">
+        <img src="IMG_2268.jpeg" alt="" />
+      </div>
+      <div class="hero-bg-divider"></div>
+      <div class="hero-bg-overlay"></div>
+    </div>
+    <div class="hero-grain"></div>
+
+    <!-- Content -->
+    <div class="hero-content">
+      <p class="hero-eyebrow">fts pathway &nbsp;/&nbsp; college soccer recruitment</p>
+
+      <h1 class="hero-display">
+        <span class="line1"><span class="hero-word">guide</span></span><br />
+        <span class="line2"><span class="hero-word outlined">your</span></span><br />
+        <span class="line3"><span class="hero-word">pathway.</span></span>
+      </h1>
+
+      <div class="hero-bottom">
+        <p class="hero-mission">
+          to guide ambition, unlock potential and build a clear pathway for young soccer players to reach success at the next level.
+        </p>
+        <a href="#how-it-works" class="hero-cta">see how it works</a>
+      </div>
+    </div>
+
+    <div class="hero-scroll-line">
+      <div class="line"></div>
+      <span>scroll</span>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <p class="section-eyebrow reveal">/01 &nbsp; about</p>
+    <h2 class="section-heading reveal reveal-delay-1">who we are.</h2>
+
+    <div class="bento-grid">
+      <!-- Card 1: large dark mission card -->
+      <div class="bento-card bento-dark bento-col-7 reveal reveal-delay-1" style="min-height:280px;">
+        <p class="bento-card-number">/01</p>
+        <p class="bento-card-title" style="font-size:1.65rem;line-height:1.1;">we open doors for young players ready to compete at the next level.</p>
+        <p class="bento-card-body" style="margin-top:1rem;">fts pathway bridges the gap between talented young soccer players and college programs. we handle the strategy, the outreach, and the roadmap — so players can focus on the game.</p>
+      </div>
+
+      <!-- Card 2: stat-style -->
+      <div class="bento-card bento-outline bento-col-5 reveal reveal-delay-2" style="min-height:280px;display:flex;flex-direction:column;justify-content:flex-end;">
+        <p class="bento-card-number">/community</p>
+        <p class="bento-card-large-text">built for<br />players.</p>
+      </div>
+
+      <!-- Card 3: pillar -->
+      <div class="bento-card bento-light bento-col-4 reveal reveal-delay-1">
+        <p class="bento-card-number">/mission</p>
+        <p class="bento-card-title">unlock your potential</p>
+        <p class="bento-card-body">we give every player the tools, strategy, and network to be seen by the right colleges.</p>
+      </div>
+
+      <!-- Card 4: pillar -->
+      <div class="bento-card bento-light bento-col-4 reveal reveal-delay-2">
+        <p class="bento-card-number">/approach</p>
+        <p class="bento-card-title">clear, direct, honest</p>
+        <p class="bento-card-body">no fluff. we tell you exactly where you stand and exactly how to move forward.</p>
+      </div>
+
+      <!-- Card 5: pillar -->
+      <div class="bento-card bento-light bento-col-4 reveal reveal-delay-3">
+        <p class="bento-card-number">/community</p>
+        <p class="bento-card-title">stronger together</p>
+        <p class="bento-card-body">a growing community of players, families, and coaches who believe in the process.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how-it-works">
+    <p class="section-eyebrow reveal">/02 &nbsp; the process</p>
+    <h2 class="section-heading reveal reveal-delay-1">the pathway.</h2>
+
+    <div class="steps-grid">
+      <div class="step-item reveal reveal-delay-1">
+        <p class="step-number">/01</p>
+        <h3 class="step-title">player evaluation</h3>
+        <p class="step-body">we assess your current level, goals, and target schools — and build an honest picture of where you stand.</p>
+        <span class="step-large-num">01</span>
+      </div>
+      <div class="step-item reveal reveal-delay-2">
+        <p class="step-number">/02</p>
+        <h3 class="step-title">college matching</h3>
+        <p class="step-body">using our network, we identify the college programs that genuinely fit your profile, timeline, and ambitions.</p>
+        <span class="step-large-num">02</span>
+      </div>
+      <div class="step-item reveal reveal-delay-3">
+        <p class="step-number">/03</p>
+        <h3 class="step-title">outreach & visibility</h3>
+        <p class="step-body">we secure spots at id camps, connect you with targeted showcases, and put you directly in front of the coaches recruiting for your level.</p>
+        <span class="step-large-num">03</span>
+      </div>
+    </div>
+
+    <!-- Second row -->
+    <div class="steps-grid" style="margin-top:12px;">
+      <div class="step-item reveal reveal-delay-1">
+        <p class="step-number">/04</p>
+        <h3 class="step-title">decision strategy</h3>
+        <p class="step-body">we walk you through every offer on the table — weighing financials, fit, playing time, and program trajectory — so your commitment is the right one, not just the first one.</p>
+        <span class="step-large-num">04</span>
+      </div>
+      <div class="step-item reveal reveal-delay-2">
+        <p class="step-number">/05</p>
+        <h3 class="step-title">commitment & beyond</h3>
+        <p class="step-body">once you commit, we support your transition — academic prep, physical benchmarks, and mindset for college soccer.</p>
+        <span class="step-large-num">05</span>
+      </div>
+      <div class="step-item reveal reveal-delay-3" style="display:flex;align-items:center;justify-content:center;">
+        <a href="#contact" class="hero-cta" style="border-color:rgba(241,238,230,0.3);">build your pathway</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- MEET THE TEAM -->
+  <section id="team">
+    <p class="section-eyebrow reveal">/03 &nbsp; the team</p>
+    <h2 class="section-heading reveal reveal-delay-1">built by players.</h2>
+
+    <div class="team-grid">
+      <!-- Lucca -->
+      <div class="founder-card">
+        <img src="IMG_2610.jpeg" alt="lucca silvani" />
+        <div class="founder-name-tag">
+          <p class="founder-role">/co-founder</p>
+          <div class="founder-name-row">
+            <h3>lucca silvani</h3>
+            <a href="https://www.instagram.com/lucca_silvani/" target="_blank" class="card-handle">@lucca_silvani</a>
+          </div>
+          <p class="short-bio">former college soccer player turned recruitment guide. lucca built fts pathway to give every player the roadmap they deserve.</p>
+        </div>
+        <div class="founder-long-bio">born in brazil, lucca made the move to the united states to pursue college soccer — living the exact journey fts pathway was built around. he competed at the ncaa level, experiencing the recruiting process from the inside out. after his playing career, he became head scout at barça residency academy arizona, one of the most respected mls next programs in the country. driven by his own story, lucca is on a mission to bridge the gap between the us and overseas — making the college soccer experience accessible to every kid with the ambition to reach it.</div>
+      </div>
+
+      <!-- Jaden -->
+      <div class="founder-card">
+        <img src="IMG_8456.jpeg" alt="jaden strumeier" />
+        <div class="founder-name-tag">
+          <p class="founder-role">/co-founder</p>
+          <div class="founder-name-row">
+            <h3>jaden strumeier</h3>
+            <a href="https://www.instagram.com/jaden_strumeier/" target="_blank" class="card-handle">@jaden_strumeier</a>
+          </div>
+          <p class="short-bio">ncaa athlete and recruitment strategist. jaden knows what college coaches look for — and how to make sure they find you.</p>
+        </div>
+        <div class="founder-long-bio">jaden grew up fully immersed in the us soccer system, competing for top clubs including barça residency academy in arizona and players development academy in new jersey. he went on to spend five years at the ncaa division i level with uncw, earning both team and individual accolades along the way. his coaching experience gives him a rare ability to see the game through a coach's eyes — knowing exactly what programs look for and how to break down film at a high level. currently an active professional, jaden is living proof of what it takes to make it to the next level, and he brings that knowledge directly to every player fts pathway works with.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT SETS US APART -->
+  <section id="stats">
+    <p class="section-eyebrow reveal">/04 &nbsp; why fts pathway</p>
+    <h2 class="section-heading reveal reveal-delay-1">what sets us apart.</h2>
+
+    <div class="apart-grid">
+      <div class="apart-card light reveal reveal-delay-1">
+        <div class="apart-value">soccer<br>only</div>
+        <div class="apart-label">dedicated athlete pool</div>
+      </div>
+      <div class="apart-card dark reveal reveal-delay-2">
+        <div class="apart-value">direct<br>access</div>
+        <div class="apart-label">communication straight to founders</div>
+      </div>
+      <div class="apart-card light reveal reveal-delay-3">
+        <div class="apart-value">1-on-1</div>
+        <div class="apart-label">meetings upon request</div>
+      </div>
+      <div class="apart-card dark reveal reveal-delay-1">
+        <div class="apart-value">long-<br>term</div>
+        <div class="apart-label">relationship with every player</div>
+      </div>
+      <div class="apart-card light reveal reveal-delay-2">
+        <div class="apart-value">100%<br>personal</div>
+        <div class="apart-label">personalized approach, every time</div>
+      </div>
+      <div class="apart-card dark reveal reveal-delay-3">
+        <div class="apart-value">your<br>goal,<br>our<br>mission</div>
+        <div class="apart-label">your success drives everything we do</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="contact-grid">
+      <div class="reveal">
+        <img src="final_fts_logo_coconut_milk.png" alt="fts pathway" style="height:80px;width:auto;display:block;margin-bottom:1.75rem;mix-blend-mode:darken;" />
+        <p class="section-eyebrow">/05 &nbsp; contact</p>
+        <h2 class="contact-statement">ready to build your pathway?</h2>
+        <p class="contact-sub">reach out on instagram or send us a message. we'll be direct about where you stand and what's possible.</p>
+      </div>
+
+      <div class="contact-right reveal reveal-delay-2">
+        <a href="https://www.instagram.com/fts.pathway/" target="_blank" class="contact-link">
+          <span class="contact-link-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+              <circle cx="12" cy="12" r="4"/>
+              <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
+            </svg>
+          </span>
+          <span>
+            <span style="display:block;font-size:0.72rem;font-weight:300;opacity:0.5;margin-bottom:2px;">find us on</span>
+            @fts.pathway
+          </span>
+        </a>
+
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSe9aEs_wLj6rBqFUNPlGtEDU3tFb4M2yqG-ZLbEsa2JYw1fhg/viewform?fbclid=PAdGRleAQgRt9leHRuA2FlbQIxMQBzcnRjBmFwcF9pZA8xMjQwMjQ1NzQyODc0MTQAAae9P9tJmithEOI-wKQ6aHQmKEIJr4vkfIYQXlEvgSYNyu68aoI6keBXc_0WVQ_aem_Twmkd1Bm5d77uTQvIfSkPA&pli=1" target="_blank" class="contact-link">
+          <span class="contact-link-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+          </span>
+          <span>
+            <span style="display:block;font-size:0.72rem;font-weight:300;opacity:0.5;margin-bottom:2px;">apply now</span>
+            start your application
+          </span>
+        </a>
+
+        <p class="contact-note">we respond within 24 hours. all inquiries welcome — players, parents, and coaches.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <img src="final_fts_logo_process_black.png" alt="fts pathway" class="footer-logo" />
+
+    <ul class="footer-links">
+      <li><a href="#about">about</a></li>
+      <li><a href="#how-it-works">how it works</a></li>
+      <li><a href="#team">team</a></li>
+      <li><a href="#stats">impact</a></li>
+      <li><a href="#contact">contact</a></li>
+    </ul>
+
+    <div class="footer-right">
+      <a href="https://www.instagram.com/fts.pathway/" target="_blank" class="footer-instagram">@fts.pathway</a>
+      <p class="footer-copy">© 2026 fts pathway. all rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // ── Reveal on scroll ──
+    const revealEls = document.querySelectorAll('.reveal');
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(el => {
+        if (el.isIntersecting) {
+          el.target.classList.add('visible');
+          revealObserver.unobserve(el.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    revealEls.forEach(el => revealObserver.observe(el));
+
+    // ── Nav active state on scroll ──
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-links a');
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(s => {
+        if (window.scrollY >= s.offsetTop - 120) current = s.id;
+      });
+      navLinks.forEach(a => {
+        a.classList.remove('active');
+        if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+      });
+    }, { passive: true });
+
+    // ── Stat counter animation ──
+    function animateCounter(el) {
+      const target = parseInt(el.dataset.target, 10);
+      const suffix = el.dataset.suffix || '';
+      const duration = 1400;
+      const startTime = performance.now();
+      function tick(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        // ease out expo
+        const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+        el.textContent = Math.floor(eased * target) + suffix;
+        if (progress < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    const statEls = document.querySelectorAll('.stat-value[data-target]');
+    const statObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          animateCounter(entry.target);
+          statObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+    statEls.forEach(el => statObserver.observe(el));
+
+    // ── Subtle card tilt on hover ──
+    document.querySelectorAll('.tilt-card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        card.style.transform = `perspective(900px) rotateY(${x * 5}deg) rotateX(${-y * 5}deg) scale(1.01)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(900px) rotateY(0deg) rotateX(0deg) scale(1)';
+      });
+    });
+
+    // ── Magnetic effect on CTA buttons ──
+    document.querySelectorAll('.nav-cta, .hero-cta').forEach(btn => {
+      btn.addEventListener('mousemove', (e) => {
+        const rect = btn.getBoundingClientRect();
+        const x = (e.clientX - rect.left - rect.width / 2) * 0.25;
+        const y = (e.clientY - rect.top - rect.height / 2) * 0.25;
+        btn.style.transform = `translate(${x}px, ${y}px)`;
+      });
+      btn.addEventListener('mouseleave', () => {
+        btn.style.transform = 'translate(0, 0)';
+      });
+    });
+  </script>
+</body>
+</html>
