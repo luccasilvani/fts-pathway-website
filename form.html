@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FTS — Player Registration</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #2B2926;
+  --black-light: #332f2b;
+  --cream: #F1EEE6;
+  --cream-dim: rgba(241,238,230,0.55);
+  --cream-faint: rgba(241,238,230,0.07);
+  --cream-border: rgba(241,238,230,0.1);
+  --d1: #8EB5A3;
+  --d2: #A09BC4;
+  --green: #6fa886;
+  --red: #c47a7a;
+  --yellow: #c4b07a;
+  --spring: cubic-bezier(0.16,1,0.3,1);
+  --fast: cubic-bezier(0.4,0,0.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Jost',sans-serif;background:var(--black);color:var(--cream);-webkit-font-smoothing:antialiased;min-height:100vh;text-transform:lowercase;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:.035;pointer-events:none;z-index:9999}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--cream-border);border-radius:2px}
+input,select,textarea,button{font-family:'Jost',sans-serif;text-transform:lowercase}
+input[type=number]{-moz-appearance:textfield}
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+
+/* ── AMBIENT ── */
+.orb{position:fixed;border-radius:50%;filter:blur(100px);pointer-events:none;z-index:0}
+.orb-1{width:560px;height:560px;background:rgba(142,181,163,.05);top:-140px;right:-120px}
+.orb-2{width:420px;height:420px;background:rgba(160,155,196,.04);bottom:-100px;left:-80px}
+
+/* ── PAGE ── */
+.page{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:48px 20px 100px}
+
+/* ── HEADER ── */
+.header{display:flex;flex-direction:column;align-items:center;gap:14px;margin-bottom:40px;text-align:center}
+.header-logo{width:54px;opacity:.92;filter:drop-shadow(0 0 20px rgba(241,238,230,.08))}
+.header-title{font-size:1.05rem;font-weight:800;letter-spacing:-.025em}
+.header-sub{font-size:.72rem;color:var(--cream-dim);font-weight:300;letter-spacing:.025em;line-height:1.5}
+
+/* ── PROGRESS ── */
+.progress-wrap{width:100%;max-width:500px;margin-bottom:28px;display:flex;flex-direction:column;gap:10px}
+.progress-track{display:flex;align-items:center}
+.pdot{width:9px;height:9px;border-radius:50%;background:var(--cream-border);flex-shrink:0;transition:background .35s var(--spring),transform .35s var(--spring),box-shadow .35s}
+.pdot.done{background:var(--d1)}
+.pdot.active{background:var(--cream);transform:scale(1.35);box-shadow:0 0 10px rgba(241,238,230,.25)}
+.pline{flex:1;height:1px;background:var(--cream-border);position:relative;overflow:hidden;margin:0 3px}
+.pline-fill{position:absolute;left:0;top:0;bottom:0;background:var(--d1);transition:width .5s var(--spring)}
+.progress-meta{display:flex;justify-content:space-between;align-items:center}
+.progress-label{font-size:.63rem;color:var(--cream-dim);letter-spacing:.05em;font-weight:500}
+.progress-pct{font-size:.63rem;color:var(--d1);font-weight:700}
+
+/* ── CARD ── */
+.form-card{width:100%;max-width:500px;padding:38px 40px;border:1px solid var(--cream-border);border-radius:22px;background:rgba(43,41,38,.88);backdrop-filter:blur(28px);box-shadow:0 32px 80px rgba(0,0,0,.35),0 0 0 1px rgba(241,238,230,.04) inset}
+@media(max-width:560px){.form-card{padding:28px 22px;border-radius:18px}}
+
+/* ── STEPS ── */
+.step{display:none}
+.step.active{display:block;animation:stepIn .38s var(--spring) both}
+@keyframes stepIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.step-title{font-size:1.08rem;font-weight:800;letter-spacing:-.025em;margin-bottom:3px}
+.step-sub{font-size:.71rem;color:var(--cream-dim);font-weight:300;letter-spacing:.02em;margin-bottom:26px}
+
+/* ── FIELDS ── */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.field{margin-bottom:15px}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:.61rem;font-weight:700;letter-spacing:.09em;color:var(--cream-dim);margin-bottom:6px;text-transform:uppercase}
+.opt{font-weight:400;opacity:.55;font-size:.59rem;letter-spacing:.03em;margin-left:4px;text-transform:lowercase}
+.field input,.field select,.field textarea{width:100%;padding:11px 14px;background:var(--cream-faint);border:1px solid var(--cream-border);border-radius:10px;color:var(--cream);font-size:.83rem;outline:none;transition:border-color .2s var(--fast),background .2s var(--fast);-webkit-appearance:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:rgba(241,238,230,.32);background:rgba(241,238,230,.06)}
+.field input::placeholder,.field textarea::placeholder{color:rgba(241,238,230,.22)}
+.field textarea{resize:none;min-height:68px;line-height:1.55}
+.field select option{background:#2B2926;color:var(--cream)}
+.field input[type=date]{color-scheme:dark}
+
+/* ── PILLS: POSITIONS ── */
+.pos-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:1px}
+.pos-pill{padding:5px 13px;border-radius:999px;border:1px solid var(--cream-border);background:none;color:var(--cream-dim);font-size:.69rem;font-weight:600;cursor:pointer;letter-spacing:.02em;transition:border-color .12s,color .12s,background .12s}
+.pos-pill:hover{border-color:rgba(241,238,230,.32);color:var(--cream)}
+.pos-pill.on{background:rgba(142,181,163,.18);color:var(--d1);border-color:rgba(142,181,163,.45)}
+
+/* ── TOGGLE PAIRS (foot, yes/no) ── */
+.toggle-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:1px}
+.tpill{padding:10px 12px;border-radius:10px;border:1px solid var(--cream-border);background:none;color:var(--cream-dim);font-size:.79rem;font-weight:600;cursor:pointer;text-align:center;transition:all .15s var(--fast);line-height:1}
+.tpill:hover{border-color:rgba(241,238,230,.3);color:var(--cream)}
+.tpill.on{background:rgba(241,238,230,.09);color:var(--cream);border-color:rgba(241,238,230,.38)}
+.tpill.on-yes{background:rgba(111,168,134,.16);color:var(--green);border-color:rgba(111,168,134,.38)}
+.tpill.on-no{background:rgba(196,122,122,.13);color:var(--red);border-color:rgba(196,122,122,.3)}
+
+/* ── SAT ROW ── */
+.sat-wrap{display:flex;gap:9px;align-items:flex-end}
+.sat-wrap .field{flex:1;margin-bottom:0}
+.sat-na-btn{flex-shrink:0;padding:11px 16px;border-radius:10px;border:1px solid var(--cream-border);background:none;color:var(--cream-dim);font-size:.75rem;font-weight:700;cursor:pointer;letter-spacing:.04em;transition:all .15s;white-space:nowrap}
+.sat-na-btn:hover{border-color:rgba(241,238,230,.3);color:var(--cream)}
+.sat-na-btn.on{background:rgba(241,238,230,.09);color:var(--cream);border-color:rgba(241,238,230,.38)}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--cream-border);margin:22px 0 18px;opacity:.5}
+
+/* ── SECTION LABEL ── */
+.section-label{font-size:.58rem;font-weight:700;letter-spacing:.1em;color:rgba(241,238,230,.35);text-transform:uppercase;margin-bottom:14px}
+
+/* ── NAV ROW ── */
+.nav-row{display:flex;align-items:center;gap:10px;margin-top:26px}
+.btn-back{padding:12px 20px;border-radius:999px;border:1px solid var(--cream-border);background:none;color:var(--cream-dim);font-size:.77rem;font-weight:600;cursor:pointer;transition:all .15s;flex-shrink:0}
+.btn-back:hover{border-color:rgba(241,238,230,.3);color:var(--cream)}
+.btn-next{flex:1;padding:14px 20px;border-radius:999px;border:none;background:var(--cream);color:var(--black);font-size:.82rem;font-weight:800;cursor:pointer;letter-spacing:.025em;transition:background .2s,transform .15s,box-shadow .2s;box-shadow:0 4px 22px rgba(241,238,230,.12)}
+.btn-next:hover{background:#fff;transform:translateY(-1px);box-shadow:0 7px 32px rgba(241,238,230,.18)}
+.btn-next:active{transform:translateY(0)}
+.btn-next:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* ── SUCCESS ── */
+#success{display:none;text-align:center;padding:12px 0}
+#success.show{display:block;animation:stepIn .5s var(--spring) both}
+.success-ring{width:64px;height:64px;border-radius:50%;background:rgba(111,168,134,.14);border:1px solid rgba(111,168,134,.32);display:flex;align-items:center;justify-content:center;margin:0 auto 22px;font-size:1.5rem;color:var(--green)}
+.success-title{font-size:1.15rem;font-weight:800;letter-spacing:-.025em;margin-bottom:10px}
+.success-body{font-size:.77rem;color:var(--cream-dim);line-height:1.75;max-width:320px;margin:0 auto}
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <img class="header-logo" src="brand%20assets/final_fts_logo_coconut_milk.png" alt="FTS Pathway">
+    <div class="header-title">player registration</div>
+    <div class="header-sub">start your recruitment journey with fts pathway</div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-wrap" id="prog-wrap">
+    <div class="progress-track">
+      <div class="pdot active" id="pd0"></div>
+      <div class="pline"><div class="pline-fill" id="pf0" style="width:0%"></div></div>
+      <div class="pdot" id="pd1"></div>
+      <div class="pline"><div class="pline-fill" id="pf1" style="width:0%"></div></div>
+      <div class="pdot" id="pd2"></div>
+      <div class="pline"><div class="pline-fill" id="pf2" style="width:0%"></div></div>
+      <div class="pdot" id="pd3"></div>
+    </div>
+    <div class="progress-meta">
+      <span class="progress-label" id="prog-label">step 1 of 4 — player info</span>
+      <span class="progress-pct" id="prog-pct">0%</span>
+    </div>
+  </div>
+
+  <!-- Card -->
+  <div class="form-card" id="form-card">
+
+    <!-- ── STEP 1: Player Info ── -->
+    <div class="step active" id="s0">
+      <div class="step-title">about you</div>
+      <div class="step-sub">basic player information</div>
+
+      <div class="row2">
+        <div class="field">
+          <label>first name</label>
+          <input type="text" id="f-first" placeholder="first" autocomplete="given-name">
+        </div>
+        <div class="field">
+          <label>last name</label>
+          <input type="text" id="f-last" placeholder="last" autocomplete="family-name">
+        </div>
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label>date of birth</label>
+          <input type="date" id="f-dob">
+        </div>
+        <div class="field">
+          <label>graduation year</label>
+          <select id="f-gradyr">
+            <option value="">select year</option>
+            <option>2025</option><option>2026</option><option>2027</option>
+            <option>2028</option><option>2029</option><option>2030</option><option>2031</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>are you a u.s. citizen?</label>
+        <div class="toggle-pair">
+          <button class="tpill" data-g="citizen" data-v="Yes" onclick="setToggle(this)">yes</button>
+          <button class="tpill" data-g="citizen" data-v="No" onclick="setToggle(this)">no</button>
+        </div>
+        <input type="hidden" id="f-citizen">
+      </div>
+
+      <div class="nav-row">
+        <div style="width:70px"></div>
+        <button class="btn-next" onclick="next(0)">next →</button>
+      </div>
+    </div>
+
+    <!-- ── STEP 2: Athletic Profile ── -->
+    <div class="step" id="s1">
+      <div class="step-title">on the pitch</div>
+      <div class="step-sub">your athletic profile</div>
+
+      <div class="field">
+        <label>position(s) <span class="opt">select all that apply</span></label>
+        <div class="pos-grid" id="pos-grid">
+          <button class="pos-pill" data-p="GK"  onclick="togglePos(this)">gk</button>
+          <button class="pos-pill" data-p="RB"  onclick="togglePos(this)">rb</button>
+          <button class="pos-pill" data-p="CB"  onclick="togglePos(this)">cb</button>
+          <button class="pos-pill" data-p="LB"  onclick="togglePos(this)">lb</button>
+          <button class="pos-pill" data-p="CDM" onclick="togglePos(this)">cdm</button>
+          <button class="pos-pill" data-p="CM"  onclick="togglePos(this)">cm</button>
+          <button class="pos-pill" data-p="CAM" onclick="togglePos(this)">cam</button>
+          <button class="pos-pill" data-p="RM"  onclick="togglePos(this)">rm</button>
+          <button class="pos-pill" data-p="LM"  onclick="togglePos(this)">lm</button>
+          <button class="pos-pill" data-p="RW"  onclick="togglePos(this)">rw</button>
+          <button class="pos-pill" data-p="LW"  onclick="togglePos(this)">lw</button>
+          <button class="pos-pill" data-p="CF"  onclick="togglePos(this)">cf</button>
+          <button class="pos-pill" data-p="ST"  onclick="togglePos(this)">st</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>preferred foot</label>
+        <div class="toggle-pair">
+          <button class="tpill" data-g="foot" data-v="Right" onclick="setToggle(this)">right foot</button>
+          <button class="tpill" data-g="foot" data-v="Left"  onclick="setToggle(this)">left foot</button>
+        </div>
+        <input type="hidden" id="f-foot">
+      </div>
+
+      <div class="row3">
+        <div class="field">
+          <label>height (ft)</label>
+          <select id="f-htft">
+            <option value="">ft</option>
+            <option>4</option><option>5</option><option>6</option><option>7</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>height (in)</label>
+          <select id="f-htin">
+            <option value="">in</option>
+            <option>0</option><option>1</option><option>2</option><option>3</option>
+            <option>4</option><option>5</option><option>6</option><option>7</option>
+            <option>8</option><option>9</option><option>10</option><option>11</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>weight (lbs)</label>
+          <input type="number" id="f-weight" placeholder="lbs" min="80" max="350">
+        </div>
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label>current club</label>
+          <input type="text" id="f-club" placeholder="club name">
+        </div>
+        <div class="field">
+          <label>level / league</label>
+          <input type="text" id="f-clublevel" placeholder="e.g. ecnl, ga, usys">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>highlight tape link <span class="opt">optional</span></label>
+        <input type="url" id="f-highlight" placeholder="youtube, hudl, or any link...">
+      </div>
+
+      <div class="nav-row">
+        <button class="btn-back" onclick="back(1)">← back</button>
+        <button class="btn-next" onclick="next(1)">next →</button>
+      </div>
+    </div>
+
+    <!-- ── STEP 3: Academics ── -->
+    <div class="step" id="s2">
+      <div class="step-title">academics</div>
+      <div class="step-sub">your current academic standing</div>
+
+      <div class="field">
+        <label>current gpa</label>
+        <input type="number" id="f-gpa" placeholder="e.g. 3.5" min="0" max="4.0" step="0.01">
+      </div>
+
+      <div class="field">
+        <label>sat score</label>
+        <div class="sat-wrap">
+          <div class="field">
+            <input type="number" id="f-sat" placeholder="400 – 1600" min="400" max="1600" step="10">
+          </div>
+          <button class="sat-na-btn" id="sat-na" onclick="toggleSatNA()">n/a</button>
+        </div>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn-back" onclick="back(2)">← back</button>
+        <button class="btn-next" onclick="next(2)">next →</button>
+      </div>
+    </div>
+
+    <!-- ── STEP 4: Contact & Family ── -->
+    <div class="step" id="s3">
+      <div class="step-title">contact & family</div>
+      <div class="step-sub">how we reach you and your family</div>
+
+      <div class="section-label">player contact</div>
+
+      <div class="row2">
+        <div class="field">
+          <label>phone number</label>
+          <input type="tel" id="f-phone" placeholder="+1 (000) 000-0000" autocomplete="tel">
+        </div>
+        <div class="field">
+          <label>email</label>
+          <input type="email" id="f-email" placeholder="your@email.com" autocomplete="email" style="text-transform:none">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>do you have whatsapp?</label>
+        <div class="toggle-pair">
+          <button class="tpill" data-g="whatsapp" data-v="Yes" onclick="setToggle(this)">yes</button>
+          <button class="tpill" data-g="whatsapp" data-v="No"  onclick="setToggle(this)">no</button>
+        </div>
+        <input type="hidden" id="f-whatsapp">
+      </div>
+
+      <div class="field">
+        <label>social media handles <span class="opt">optional</span></label>
+        <input type="text" id="f-social" placeholder="e.g. @username on instagram, tiktok...">
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-label">parent / guardian</div>
+
+      <div class="field">
+        <label>parent / guardian name</label>
+        <input type="text" id="f-pname" placeholder="full name" autocomplete="off">
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label>parent / guardian phone</label>
+          <input type="tel" id="f-pphone" placeholder="+1 (000) 000-0000">
+        </div>
+        <div class="field">
+          <label>parent / guardian email</label>
+          <input type="email" id="f-pemail" placeholder="parent@email.com" style="text-transform:none">
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="field">
+        <label>how did you hear about us?</label>
+        <select id="f-heard">
+          <option value="">select an option</option>
+          <option value="Instagram">instagram</option>
+          <option value="TikTok">tiktok</option>
+          <option value="Twitter / X">twitter / x</option>
+          <option value="YouTube">youtube</option>
+          <option value="Facebook">facebook</option>
+          <option value="Coach / Manager Referral">coach / manager referral</option>
+          <option value="Friend or Family">friend or family</option>
+          <option value="Google Search">google search</option>
+          <option value="Event / Showcase">event / showcase</option>
+          <option value="Other">other</option>
+        </select>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn-back" onclick="back(3)">← back</button>
+        <button class="btn-next" id="submit-btn" onclick="submitForm()">submit ✓</button>
+      </div>
+    </div>
+
+    <!-- ── SUCCESS ── -->
+    <div id="success">
+      <div class="success-ring">✓</div>
+      <div class="success-title">you're in the system</div>
+      <div class="success-body">
+        thank you for registering with fts pathway.<br>
+        a member of our team will be in touch shortly to discuss your recruitment journey.
+      </div>
+    </div>
+
+  </div><!-- /form-card -->
+</div><!-- /page -->
+
+<script>
+// ─── CONFIG — replace after deploying your Apps Script ───────────────────────
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQhiQJOVHGc5X_hW7Xkl7ayIf5n-y1xHwpSKJWdHVEFp0kUv54jVCY6Z-QX8__Ul1Q/exec';
+// ─────────────────────────────────────────────────────────────────────────────
+
+const TOTAL_STEPS = 4;
+let step = 0;
+let satNA = false;
+const positions = new Set();
+const toggles = { citizen: '', foot: '', whatsapp: '' };
+
+const STEP_META = [
+  { label: 'step 1 of 4 — player info',      pct: '0%'  },
+  { label: 'step 2 of 4 — athletic profile',  pct: '25%' },
+  { label: 'step 3 of 4 — academics',         pct: '50%' },
+  { label: 'step 4 of 4 — contact & family',  pct: '75%' },
+];
+
+function updateProgress(s) {
+  for (let i = 0; i < TOTAL_STEPS; i++) {
+    const dot = document.getElementById(`pd${i}`);
+    dot.className = 'pdot' + (i < s ? ' done' : i === s ? ' active' : '');
+  }
+  for (let i = 0; i < TOTAL_STEPS - 1; i++) {
+    document.getElementById(`pf${i}`).style.width = i < s ? '100%' : '0%';
+  }
+  document.getElementById('prog-label').textContent = STEP_META[s].label;
+  document.getElementById('prog-pct').textContent   = STEP_META[s].pct;
+}
+
+function showStep(s) {
+  document.querySelectorAll('.step').forEach((el, i) => {
+    el.classList.toggle('active', i === s);
+  });
+  step = s;
+  updateProgress(s);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function next(from) {
+  if (!validate(from)) return;
+  showStep(from + 1);
+}
+function back(from) { showStep(from - 1); }
+
+// ─── POSITION PILLS ──────────────────────────────────────────────────────────
+function togglePos(btn) {
+  const p = btn.dataset.p;
+  if (positions.has(p)) { positions.delete(p); btn.classList.remove('on'); }
+  else                   { positions.add(p);    btn.classList.add('on'); }
+}
+
+// ─── TOGGLE PAIRS ────────────────────────────────────────────────────────────
+function setToggle(btn) {
+  const g = btn.dataset.g, v = btn.dataset.v;
+  document.querySelectorAll(`.tpill[data-g="${g}"]`).forEach(b => b.className = 'tpill');
+  toggles[g] = v;
+  // Foot: neutral style; citizen/whatsapp: green/red
+  if (g === 'foot') {
+    btn.classList.add('on');
+  } else {
+    btn.classList.add(v === 'Yes' ? 'on-yes' : 'on-no');
+  }
+  const idMap = { citizen: 'f-citizen', foot: 'f-foot', whatsapp: 'f-whatsapp' };
+  document.getElementById(idMap[g]).value = v;
+}
+
+// ─── SAT N/A ─────────────────────────────────────────────────────────────────
+function toggleSatNA() {
+  satNA = !satNA;
+  const inp = document.getElementById('f-sat');
+  const btn = document.getElementById('sat-na');
+  inp.disabled  = satNA;
+  inp.value     = satNA ? '' : inp.value;
+  inp.placeholder = satNA ? 'n/a selected' : '400 – 1600';
+  btn.classList.toggle('on', satNA);
+}
+
+// ─── VALIDATION ──────────────────────────────────────────────────────────────
+function v(id) { return document.getElementById(id).value.trim(); }
+function alert2(msg) { alert(msg); return false; }
+
+function validate(s) {
+  if (s === 0) {
+    if (!v('f-first'))   return alert2('please enter your first name.');
+    if (!v('f-last'))    return alert2('please enter your last name.');
+    if (!v('f-dob'))     return alert2('please enter your date of birth.');
+    if (!v('f-gradyr'))  return alert2('please select your graduation year.');
+    if (!toggles.citizen) return alert2('please indicate whether you are a u.s. citizen.');
+  }
+  if (s === 1) {
+    if (!positions.size)  return alert2('please select at least one position.');
+    if (!toggles.foot)    return alert2('please select your preferred foot.');
+    if (!v('f-htft') || document.getElementById('f-htin').value === '')
+                          return alert2('please select your full height.');
+    if (!v('f-weight'))   return alert2('please enter your weight.');
+    if (!v('f-club'))     return alert2('please enter your current club.');
+    if (!v('f-clublevel'))return alert2('please enter your club level / league.');
+  }
+  if (s === 2) {
+    if (!v('f-gpa'))      return alert2('please enter your current gpa.');
+    const satVal = document.getElementById('f-sat').value;
+    if (!satNA && !satVal) return alert2('please enter your sat score or select n/a.');
+  }
+  if (s === 3) {
+    if (!v('f-phone'))    return alert2('please enter your phone number.');
+    const em = v('f-email');
+    if (!em || !em.includes('@')) return alert2('please enter a valid email address.');
+    if (!toggles.whatsapp)return alert2('please indicate whether you have whatsapp.');
+    if (!v('f-pname'))    return alert2('please enter your parent / guardian name.');
+    if (!v('f-pphone'))   return alert2('please enter your parent / guardian phone number.');
+    const pe = v('f-pemail');
+    if (!pe || !pe.includes('@')) return alert2('please enter a valid parent / guardian email.');
+    if (!v('f-heard'))    return alert2('please let us know how you heard about us.');
+  }
+  return true;
+}
+
+// ─── SUBMIT ──────────────────────────────────────────────────────────────────
+async function submitForm() {
+  if (!validate(3)) return;
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'submitting...';
+
+  const payload = {
+    firstName:     v('f-first'),
+    lastName:      v('f-last'),
+    dob:           v('f-dob'),
+    gradYear:      v('f-gradyr'),
+    usCitizen:     toggles.citizen,
+    positions:     [...positions].join(', '),
+    preferredFoot: toggles.foot,
+    height:        `${v('f-htft')}'${document.getElementById('f-htin').value}"`,
+    weight:        v('f-weight') + ' lbs',
+    club:          v('f-club'),
+    clubLevel:     v('f-clublevel'),
+    highlightLink: v('f-highlight') || 'N/A',
+    gpa:           v('f-gpa'),
+    sat:           satNA ? 'N/A' : document.getElementById('f-sat').value,
+    phone:         v('f-phone'),
+    email:         document.getElementById('f-email').value.trim(),
+    hasWhatsapp:   toggles.whatsapp,
+    socialMedia:   v('f-social') || 'N/A',
+    parentName:    v('f-pname'),
+    parentPhone:   v('f-pphone'),
+    parentEmail:   document.getElementById('f-pemail').value.trim(),
+    howHeard:      v('f-heard'),
+  };
+
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method:  'POST',
+      mode:    'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body:    JSON.stringify(payload),
+    });
+    // With no-cors the response is opaque — data is written to the sheet.
+    showSuccess();
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = 'submit ✓';
+    alert('something went wrong. please try again or contact us directly.');
+  }
+}
+
+function showSuccess() {
+  document.querySelectorAll('.step').forEach(s => s.style.display = 'none');
+  document.getElementById('prog-wrap').style.opacity = '0';
+  document.getElementById('prog-wrap').style.pointerEvents = 'none';
+  const sc = document.getElementById('success');
+  sc.style.display = 'block';
+  requestAnimationFrame(() => sc.classList.add('show'));
+}
+</script>
+</body>
+</html>
