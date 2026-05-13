@@ -142,16 +142,15 @@
       object-fit: cover;
       object-position: center top;
       display: block;
-      filter: grayscale(100%) brightness(0.38) contrast(1.1);
+      filter: grayscale(100%) brightness(0.58) contrast(1.1);
     }
 
     .hero-bg-half.right img {
-      /* boost contrast slightly to compensate for lower source resolution */
-      filter: grayscale(100%) brightness(0.38) contrast(1.25) saturate(0);
+      filter: grayscale(100%) brightness(0.58) contrast(1.2) saturate(0);
       object-fit: cover;
-      object-position: center 8%;
+      object-position: center 24%;
       transform: scale(1.18);
-      transform-origin: center 8%;
+      transform-origin: center 24%;
     }
 
     .hero-bg-divider {
@@ -782,16 +781,18 @@
     .founder-long-bio {
       position: absolute;
       bottom: 0; left: 0; right: 0;
-      padding: 28px 28px 26px;
-      background: linear-gradient(to bottom, rgba(43,41,38,0.7) 0%, rgba(43,41,38,0.82) 100%);
+      padding: 32px 28px 30px;
+      background: linear-gradient(to bottom, rgba(43,41,38,0.72) 0%, rgba(43,41,38,0.88) 100%);
       transform: translateY(100%);
       transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.04s;
       font-family: 'Jost', 'Helvetica Neue', sans-serif;
-      font-size: 0.72rem;
+      font-size: 0.85rem;
       font-weight: 300;
-      color: rgba(241,238,230,0.82);
+      color: rgba(241,238,230,0.88);
       text-transform: lowercase;
-      line-height: 1.65;
+      line-height: 1.7;
+      max-height: 72%;
+      overflow-y: auto;
     }
 
     .founder-card:hover .founder-long-bio {
